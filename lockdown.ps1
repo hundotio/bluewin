@@ -175,17 +175,6 @@ function Local($PCName) {
     Write-Host "`nStarting Local Windows Hardening!`n"
 
     $HostData = $Hosts[$PCName]
-
-    Write-Host "`nMinimzing Firewall to Set Services..."
-        # Block all inbound and outbound traffic
-        netsh advfirewall reset
-        netsh advfirewall set allprofiles firewallpolicy blockinbound,blockoutbound
-
-        # Enable service for the specified host
-        foreach($port in $HostData.Service){
-            netsh advfirewall firewall add rule name="Allow $port Outbound" dir=out protocol=tcp remoteport=$port localport=$port action=allow
-            netsh advfirewall firewall add rule name="Allow $port Inbound" dir=in protocol=tcp remoteport=$port localport=$port action=allow
-        }
     
     Write-Host "`nListing Running Listening Services..."
         netstat -ano | findstr LISTEN
@@ -336,6 +325,17 @@ function Local($PCName) {
             $ZIP = [System.IO.Path]::GetFileName($URL)
             Invoke-WebRequest $URL -OutFile $ZIP
             Expand-Archive -Path $ZIP -DestinationPath ./ -Force
+        }
+    
+    Write-Host "`nMinimzing Firewall to Set Services..."
+        # # Block all inbound and outbound traffic
+        netsh advfirewall reset
+        netsh advfirewall set allprofiles firewallpolicy blockinbound,blockoutbound
+
+        # # Enable service for the specified host
+        foreach($port in $HostData.Service){
+            netsh advfirewall firewall add rule name="Allow $port Outbound" dir=out protocol=tcp remoteport=$port localport=$port action=allow
+            netsh advfirewall firewall add rule name="Allow $port Inbound" dir=in protocol=tcp remoteport=$port localport=$port action=allow
         }
     
     Write-Host "`nDone!`n"
