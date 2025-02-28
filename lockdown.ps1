@@ -39,11 +39,11 @@ $Hosts = @{
         Users   = @("getaway", "driver")
         Admins  = @("watchdog", "manager", "mastermind")
     }
-    "DC01" = @{
+    "win" = @{
         IP      = "10.0.1.16"
-        Service = @("22", "135", "445", "3389") # SSH, RDP
-        Users   = @("getaway", "driver")
-        Admins   = @("watchdog", "mastermind")
+        Service = @("53", "88", "135", "389", "636", "445", "3389")
+        Users   = @("user.one", "user.two")
+        Admins   = "mastermind"
     }
 }
 
@@ -328,7 +328,15 @@ function Local($PCName) {
         }
     
     Write-Host "`nMinimzing Firewall to Set Services..."
-        # # Block all inbound and outbound traffic
+        # Start RDP Service
+        Set-Service -Name TermService -StartupType Automatic
+        Start-Service -Name TermService
+
+        if ((Get-NetFirewallRule -DisplayName "Remote Desktop - User Mode (TCP-In)").Enabled -eq $false) {
+            Enable-NetFirewallRule -DisplayName "Remote Desktop - User Mode (TCP-In)"
+        }
+
+        # Block all inbound and outbound traffic
         netsh advfirewall reset
         netsh advfirewall set allprofiles firewallpolicy blockinbound,blockoutbound
 
@@ -337,6 +345,11 @@ function Local($PCName) {
             netsh advfirewall firewall add rule name="Allow $port Outbound" dir=out protocol=tcp remoteport=$port localport=$port action=allow
             netsh advfirewall firewall add rule name="Allow $port Inbound" dir=in protocol=tcp remoteport=$port localport=$port action=allow
         }
+
+        # Ensure RDP didn't go down
+        Set-Service -Name TermService -StartupType Automatic
+        Start-Service -Name TermService
+        Enable-NetFirewallRule -DisplayName "Remote Desktop - User Mode (TCP-In)"
     
     Write-Host "`nDone!`n"
 }
