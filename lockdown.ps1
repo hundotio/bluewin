@@ -56,8 +56,8 @@ $Tools = @{
 
 # Pull hostname and verify it's correct
 function CheckHostname {
-    $PCName = "vault"
-    #$PCName = $env:computername
+    #$PCName = "vault"
+    $PCName = $env:computername
 
     if ($Hosts.ContainsKey($PCName)){
         Write-Host ("Host appears to be " + $PCName + ". Begin lockdown? (y/n)")
