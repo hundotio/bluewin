@@ -1,7 +1,11 @@
 Write-Host "`nStarting Windows User Hardening!`n"
 
 function Main {
-    Get-LocalUser | ForEach-Object { HardenUser -Username $_.Name }
+    Get-LocalUser | ForEach-Object { 
+        if ($_ -and $_.Name -notin @('krbtgt', 'DefaultAccount', 'WDAGUtilityAccount')) {
+            HardenUser -Username $_.Name 
+        }
+    }
 }
 
 function HardenUser {
@@ -10,7 +14,7 @@ function HardenUser {
     )    
     $newadminpass = GenerateStrongPassword
     Write-Host "$username's New Password: $newadminpass"
-    net user $user $newadminpass
+    net user $username $newadminpass
 }
 
 function GenerateStrongPassword {
