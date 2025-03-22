@@ -1,4 +1,5 @@
 ## To run the user hardening thingymabob
+`powershell.exe -ep bypass`
 `iwr https://raw.githubusercontent.com/hundotio/bluewin/refs/heads/main/users.ps1 | iex`
 
 ## lmao
