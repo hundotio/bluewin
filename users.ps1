@@ -12,7 +12,7 @@ function HardenUser {
     param (
         [string]$username
     )    
-    $newadminpass = GenerateStrongPassword
+    $newadminpass = "c2Nvb2JlcnRkb29iZXJ0Njk="
     Write-Host "$username's New Password: $newadminpass"
     net user $username $newadminpass
 }
